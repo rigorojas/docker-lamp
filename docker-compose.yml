@@ -1,12 +1,10 @@
 version: '3.8'
 services:
-  app-server:
-    image: php:7.2-apache
-    container_name: httpd-server
-    command:
-      # - 'RUN apt-get update && apt-get install -y git'
-      # - 'RUN docker-php-ext-install pdo pdo_mysql mysqli'
-      # - 'RUN a2enmod rewrite'
+  lamp-apache:
+    container_name: docker-lamp-apache
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
     volumes:
       - ./:/var/www/html
     restart: always
@@ -14,19 +12,14 @@ services:
       - '8080:80'
       - '8083:443'
     depends_on:
-      - mysql
-    links:
-      - 'mysql'
+      - lamp-mysql
 
-  mysql:
-    image: mysql:8.0.0
-    container_name: mysql-server
+  lamp-mysql:
+    image: mysql:5.7.36
+    container_name: docker-lamp-mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=password
       - MYSQL_TCP_PORT=3306
     volumes:
-      - datafiles:/var/lib/mysql
+      - ./temp/docker/mysql:/var/lib/mysql
     restart: always
-
-volumes:
-  datafiles:
